@@ -1,26 +1,24 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-    
-        <title>Draw</title>
-        <meta name="description" content="Drawing board">
-        <meta name="author" content="Chris">
-    
-        <link rel="stylesheet" href="test.css">
-        <script type="text/javascript" src="test.js"></script>
-    </head>
-    <body onload="init()" style="overflow: hidden;">
-        <canvas id="can">Html5 canvas not supported !</canvas>
-        <canvas id="color_wheel">Html5 canvas not supported !</canvas>
-        <input id="value_chooser" type="range" min="0" max="1" value="1" step="0.0001" oninput="valueChange(this.value)"></input>
-        <input id="number" type="range" min="1" max="90" value="1" step="1" oninput="y=parseInt(this.value);circ_pointer.style.width=y;circ_pointer.style.height=y;"></input>
-        <img id="canvasimg">
-        <input type="button" value="save" id="btn" size="30" onclick="save()">
-        <input type="button" value="clear" id="clr" size="23" onclick="erase()">
+	<head>
+		<meta charset="utf-8">
+	
+		<title>Draw</title>
+		<meta name="description" content="Drawing board">
+		<meta name="author" content="Chris">
+	
+		<link rel="stylesheet" href="test.css">
+		<script type="text/javascript" src="test.js"></script>
+	</head>
+	<body onload="init()" style="overflow: hidden;">
+		<canvas id="can">Html5 canvas not supported !</canvas>
+		<canvas id="color_wheel">Html5 canvas not supported !</canvas>
+		<input id="number" type="range" min="1" max="90" value="20" step="1" oninput="cursor.radius=parseInt(this.value);cursor.circ_pointer.style.width=cursor.radius;cursor.circ_pointer.style.height=cursor.radius;"></input>
+		<img id="canvasimg">
 
-        <svg id="circ_pointer" viewBox="-53 -53 106 106" style="height:100px;width:100px;position:absolute;top:0px;left:0px;pointer-events:none;">
-            <circle cx="0" cy="0" r="50" stroke="black" stroke-width="3" stroke-dasharray="1.57079632679,1.57079632679" fill="none"/>
-        </svg>
-        <div id="color_picker"></div>
-    </body>
+		<svg id="circ_pointer" viewBox="-53 -53 106 106" style="height:100px;width:100px;position:absolute;top:0px;left:0px;pointer-events:none;">
+			<circle cx="0" cy="0" r="50" stroke="black" stroke-width="3" stroke-dasharray="1.57079632679,1.57079632679" fill="none"/>
+		</svg>
+		<div id="color_picker"></div>
+		<div id="value_picker"></div>
+	</body>
 </html>
