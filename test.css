@@ -1,0 +1,48 @@
+body
+{
+    background-color: #AAAAAA;
+}
+
+#canvasimg
+{
+    position:absolute;
+    top:10%;
+    left:52%;
+    display:none;
+}
+
+#can
+{
+    width:400px;
+    height:400px;
+    position:absolute;
+    top:10%;
+    left:10%;
+}
+
+#color_wheel
+{
+    width:101px;
+    height:101px;
+    position:absolute;
+    top:60%;
+    left:80%;
+}
+
+#value_chooser
+{
+    position: absolute;
+    top: 60%;
+    left: 90%;
+    transform: rotate(90deg);
+}
+
+#color_picker
+{
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    border: 1px solid #000;
+    position:absolute;
+}
