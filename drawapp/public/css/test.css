@@ -47,6 +47,7 @@ body
 	background-color: #ffffff;
 	border: 1px solid #000;
 	position:absolute;
+	pointer-events:none;
 }
 
 #value_picker
@@ -57,6 +58,7 @@ body
 	background-color: #ffffff;
 	border: 1px solid #000;
 	position:absolute;
+	pointer-events:none;
 }
 
 
