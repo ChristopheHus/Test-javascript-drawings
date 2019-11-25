@@ -2,6 +2,7 @@ import * as draw from './draw.js';
 import ClickHandler from './clickHandler.js';
 import ColorWheel from './colorWheel.js';
 import Color from './color.js';
+import Connection from './connection.js';
 
 var drawing = false,
 	drawing_board = {canvas: null, ctx: null, w: 0, h: 0},
@@ -46,6 +47,26 @@ export function init()
 	cursor.circ_pointer.style.height = cursor.radius;
 
 	ColorWheel.init();
+
+	Connection.init((msg) =>
+	{
+		console.log(msg.type);
+		switch(msg.type)
+		{
+		case "draw":
+			draw.draw(drawing_board.ctx, msg.from, msg.to, msg.opt[1], msg.opt[0]);
+			break;
+		case "end":
+			draw.drawEnd(drawing_board.ctx, msg.to, msg.opt[1], msg.opt[0]);
+			break;
+		case "erase":
+			draw.erase(drawing_board.ctx, drawing_board.w, drawing_board.h, msg.opt[0]);
+			break;
+		case "fill":
+			draw.fill(drawing_board.ctx, drawing_board.w, drawing_board.h, msg.from[0], msg.from[1], msg.opt[0]);
+			break;
+		}
+	});
 }
 
 function findColor(a,b)
@@ -85,7 +106,7 @@ function findxy(res, e)
 				mousePos.curr = {x: e.clientX-drawing_board.canvas.offsetLeft, y: e.clientY-drawing_board.canvas.offsetTop};
 
 				drawing = true;
-				draw.drawEnd(drawing_board.ctx, mousePos, cursor, ColorWheel.getCurrentColor());
+				draw.drawEnd(drawing_board.ctx, mousePos.curr, cursor.radius, ColorWheel.getCurrentColor());
 			}
 		}
 		else if(e.buttons&0b10)
@@ -108,8 +129,8 @@ function findxy(res, e)
 			mousePos.prev = mousePos.curr;
 			mousePos.curr = {x: e.clientX-drawing_board.canvas.offsetLeft, y: e.clientY-drawing_board.canvas.offsetTop};
 
-			draw.draw(drawing_board.ctx, mousePos, cursor, ColorWheel.getCurrentColor());
-			draw.drawEnd(drawing_board.ctx, mousePos, cursor, ColorWheel.getCurrentColor());
+			draw.draw(drawing_board.ctx, mousePos.prev, mousePos.curr, cursor.radius, ColorWheel.getCurrentColor());
+			draw.drawEnd(drawing_board.ctx, mousePos.curr, cursor.radius, ColorWheel.getCurrentColor());
 		}
 	}
 	if (res=='up' || res=='out')

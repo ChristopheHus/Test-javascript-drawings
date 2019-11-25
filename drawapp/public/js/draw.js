@@ -1,30 +1,42 @@
-export function draw (ctx, mousePos, cursor, color)
+import Connection from './connection.js';
+
+
+export function draw (ctx, prev, curr, radius, color)
 {
 	ctx.beginPath();
-	ctx.moveTo(mousePos.prev.x, mousePos.prev.y);
-	ctx.lineTo(mousePos.curr.x, mousePos.curr.y);
-	ctx.strokeStyle = color.toHexStr();
-	ctx.lineWidth = cursor.radius;
+	ctx.moveTo(prev.x, prev.y);
+	ctx.lineTo(curr.x, curr.y);
+	ctx.strokeStyle = typeof(color)=="string"? color : color.toHexStr();
+	ctx.lineWidth = radius;
 	ctx.stroke();
 	ctx.closePath();
+
+	if (!(typeof(color)=="string"))
+		Connection.send({type:"draw", opt:[color.toHexStr(),radius], from:prev, to:curr});
 }
 
-export function drawEnd (ctx, mousePos, cursor, color)
+export function drawEnd (ctx, curr, radius, color)
 {
 	ctx.beginPath();
-	ctx.arc(mousePos.curr.x, mousePos.curr.y, cursor.radius/2., 0, 2 * Math.PI, false);
-	ctx.fillStyle = color.toHexStr();
+	ctx.arc(curr.x, curr.y, radius/2., 0, 2 * Math.PI, false);
+	ctx.fillStyle = typeof(color)=="string"? color : color.toHexStr();
 	ctx.fill();
 	ctx.closePath();
+
+	if (!(typeof(color)=="string"))
+		Connection.send({type:"end", opt:[color.toHexStr(),radius], to:curr});
 }
 
 export function erase(ctx, w, h, color)
 {
 	ctx.beginPath();
 	ctx.rect(0, 0, w, h);
-	ctx.fillStyle = color.toHexStr();
+	ctx.fillStyle = typeof(color)=="string"? color : color.toHexStr();
 	ctx.fill();
 	ctx.closePath();
+
+	if (!(typeof(color)=="string"))
+		Connection.send({type:"erase", opt:[color.toHexStr()]});
 }
 
 export function fill(ctx, w, h, x0, y0, color)
@@ -32,7 +44,11 @@ export function fill(ctx, w, h, x0, y0, color)
 	var imgData = ctx.getImageData(0, 0, w, h);
 	var pixels = imgData.data;
 
-	var nextColor = [color.R(),color.G(),color.B()];
+	var nextColor;
+	if (typeof(color) == "string")
+		nextColor = [parseInt(color.substr(1,2),16), parseInt(color.substr(3,2),16), parseInt(color.substr(5,2),16)];
+	else
+		nextColor = [Math.round(color.R()*255),Math.round(color.G()*255),Math.round(color.B()*255)];
 	var ind = (x0+y0*imgData.width)*4;
 	var prevColor = [pixels[ind], pixels[ind+1], pixels[ind+2]];
 
@@ -55,4 +71,7 @@ export function fill(ctx, w, h, x0, y0, color)
 	}
 
 	ctx.putImageData(imgData, 0, 0);
+
+	if (!(typeof(color)=="string"))
+		Connection.send({type:"fill", opt:[color.toHexStr()], from:[x0,y0]});
 }

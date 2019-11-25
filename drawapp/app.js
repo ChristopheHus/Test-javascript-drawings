@@ -3,7 +3,6 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var fs = require("fs");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -21,11 +20,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use(/\.(css)$/, (req, res) =>
-{
-	console.log(req);
-	res.send(fs.readFileSync(__dirname + "/public/css/test.css", 'utf8'));
-});
 
 app.use(function(req, res, next)
 {
@@ -45,3 +39,45 @@ app.use(function(err, req, res, next)
 module.exports = app;
 
 process.env.port = 5000;
+
+
+
+var WebSocketServer = require('websocket').server;
+var http = require('http');
+
+var server = http.createServer(function(request, response)
+{
+});
+var clients = [];
+
+
+server.listen(1337, function() { });
+
+wsServer = new WebSocketServer(
+{
+	httpServer: server
+});
+
+wsServer.on('request', function(request)
+{
+	var connection = request.accept(null, request.origin);
+	clients.push(connection);
+
+	connection.on('message', function(message)
+	{
+		console.log("Message", message);
+		if (message.type == "utf8")
+		{
+			clients.forEach(e => {e.send(message.utf8Data);});
+		}
+		else
+		{
+			console.log(message.type);
+		}
+	});
+
+	connection.on('close', function(connection)
+	{
+		console.log("Closing", connection);
+	});
+});
