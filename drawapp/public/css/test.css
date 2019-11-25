@@ -24,7 +24,7 @@ body
 
 #color_wheel
 {
-	width:141px;
+	width:183px;
 	height:101px;
 	position:absolute;
 	top:60%;
@@ -50,7 +50,7 @@ body
 	pointer-events:none;
 }
 
-#value_picker
+.picker
 {
 	height: 8px;
 	width: 20px;

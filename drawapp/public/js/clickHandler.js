@@ -7,9 +7,9 @@ class ClickHandler
 		this.selected = null;
 	}
 
-	addField (area, callback)
+	addField (id, area, callback)
 	{
-		this.fields.push({area:area, callback:callback});
+		this.fields.push({id:id, area:area, callback:callback});
 	}
 
 	findArea (x, y)
@@ -22,6 +22,11 @@ class ClickHandler
 				return i;
 		}
 		return -1;
+	}
+
+	updateArea(id, area)
+	{
+		this.fields = this.fields.map(e => {return e.id == id ? {id:e.id,area:area,callback:e.callback} : e});
 	}
 
 	onMouseDown (e)

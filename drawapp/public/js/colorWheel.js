@@ -12,9 +12,10 @@ class ColorWheel
 
 		this.color_picker = null;
 		this.value_picker = null;
+		this.size_picker = null;
 
 		this.pointer = new Color();
-		this.positions = {cx:0, cy:0, valueStart:0};
+		this.positions = {cx:0, cy:0, valueStart:0, width:0, sizeStart:0};
 	}
 
 	init ()
@@ -27,21 +28,31 @@ class ColorWheel
 
 		this.color_picker = document.getElementById("color_picker");
 		this.value_picker = document.getElementById("value_picker");
+		this.size_picker = document.getElementById("size_picker");
 
 		this.positions.cx = Math.floor((this.canvas.height-1)/2);
 		this.positions.cy = this.positions.cx;
 		this.positions.valueStart = Math.ceil(this.positions.cx/2)+this.canvas.height;
+		this.positions.width = Math.floor(this.positions.cx*.33);
+		this.positions.sizeStart = this.positions.valueStart + this.positions.width + Math.ceil(this.positions.cx/2);
 
 		this.pointer.setXYV({x:0, y:0, v:1});
 
 		ClickHandler.addField(
+			"color_picker",
 			{x:this.canvas.offsetLeft, y:this.canvas.offsetTop, w:this.canvas.height, h:this.canvas.height},
-			(s,e)=>{this.moveColorPicker(e);}
+			(s,e) => {this.moveColorPicker(e);}
 		);
 		ClickHandler.addField(
-			{x:this.canvas.offsetLeft+this.positions.valueStart, y:this.canvas.offsetTop, w:this.canvas.width-this.positions.valueStart, h:this.canvas.height},
-			(s,e)=>{this.moveValuePicker(e);}
+			"value_picker",
+			{x:this.canvas.offsetLeft+this.positions.valueStart, y:this.canvas.offsetTop, w:this.positions.width, h:this.canvas.height},
+			(s,e) => {this.moveValuePicker(e);}
 		);
+		ClickHandler.addField(
+			"size_picker",
+			{x:this.canvas.offsetLeft+this.positions.sizeStart, y:this.canvas.offsetTop, w:this.positions.width, h:this.canvas.height},
+			(s,e) => {window.cursorResize(91-(e.clientY-this.canvas.offsetTop)/this.canvas.height*90);}
+		)
 
 		
 		this.color_picker.style.left = (this.canvas.offsetLeft + this.positions.cx - 4) + "px";
@@ -49,7 +60,11 @@ class ColorWheel
 
 		this.value_picker.style.left = (this.canvas.offsetLeft + this.positions.valueStart - 4) + "px";
 		this.value_picker.style.top = (this.canvas.offsetTop + this.canvas.height - 4) + "px";
-		this.value_picker.style.width = (this.canvas.width - this.positions.valueStart + 5) + "px";
+		this.value_picker.style.width = (this.positions.width + 6) + "px";
+
+		this.size_picker.style.left = (this.canvas.offsetLeft + this.positions.sizeStart - 4) + "px";
+		this.size_picker.style.top = (this.canvas.offsetTop + this.canvas.height - 4) + "px";
+		this.size_picker.style.width = (this.positions.width + 6) + "px";
 
 		this.render();
 		this.renderPickers();
@@ -78,7 +93,11 @@ class ColorWheel
 
 		this.value_picker.style.left = (this.canvas.offsetLeft + this.positions.valueStart - 4) + "px";
 		this.value_picker.style.top = (this.canvas.offsetTop + this.pointer.V()*this.canvas.height) - 4 + "px";
-	}
+
+		ClickHandler.updateArea("color_picker", {x:this.canvas.offsetLeft, y:this.canvas.offsetTop, w:this.canvas.height, h:this.canvas.height});
+		ClickHandler.updateArea("value_picker", {x:this.canvas.offsetLeft+this.positions.valueStart, y:this.canvas.offsetTop, w:this.positions.width, h:this.canvas.height});
+		ClickHandler.updateArea("size_picker", {x:this.canvas.offsetLeft+this.positions.sizeStart, y:this.canvas.offsetTop, w:this.positions.width, h:this.canvas.height});
+	} 
 
 	moveValuePicker (e)
 	{
@@ -162,13 +181,26 @@ class ColorWheel
 		}
 
 		for(var j=0; j<this.canvas.height; j++)
-		for(var i=this.positions.valueStart; i<this.canvas.width; i++)
+		for(var i=this.positions.valueStart; i<this.positions.valueStart+this.positions.width; i++)
 		{
 			let ind = (j*imgData.width + i)*4;
 			pixels[ind] = 255*j/this.canvas.height;
 			pixels[ind+1] = 255*j/this.canvas.height;
 			pixels[ind+2] = 255*j/this.canvas.height;
 			pixels[ind+3] = 255;
+		}
+
+		for (var j=0; j<this.canvas.height; j++)
+		{
+			var dx = Math.floor((this.positions.width-4)/2 * j / this.canvas.height);
+			for (var i=this.positions.sizeStart+dx; i<this.canvas.width-dx; i++)
+			{
+				let ind = (j*imgData.width + i)*4;
+				pixels[ind] = 140;
+				pixels[ind+1] = 140;
+				pixels[ind+2] = 140;
+				pixels[ind+3] = 255;
+			}
 		}
 
 		this.ctx.putImageData(imgData, 0, 0);

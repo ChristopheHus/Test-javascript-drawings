@@ -11,14 +11,15 @@ class Connection
 
 		this.connection = new WebSocket('ws://127.0.0.1:1337');
 
-		this.connection.onopen = function ()
+		this.connection.onopen = () =>
 		{
 			console.log("Open");
+			this.send({type: "init"});
 		};
 
 		this.connection.onerror = function (error)
 		{
-			console.log("Error", error);
+			console.error(error);
 		};
 
 		this.connection.onmessage = function (message)
@@ -30,7 +31,7 @@ class Connection
 			}
 			catch (e)
 			{
-				console.log(e);
+				console.error(e);
 				return;
 			}
 		};

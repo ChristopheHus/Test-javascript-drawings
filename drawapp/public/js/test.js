@@ -38,6 +38,7 @@ export function init()
 	window.addEventListener('mouseup', ClickHandler.onMouseUp.bind(ClickHandler), false);
 
 	ClickHandler.addField(
+		"canvas",
 		{x:drawing_board.canvas.offsetLeft, y:drawing_board.canvas.offsetTop, w:drawing_board.canvas.width, h:drawing_board.canvas.height},
 		(s,e)=>{findxy(s,e);}
 	);
@@ -50,21 +51,32 @@ export function init()
 
 	Connection.init((msg) =>
 	{
-		console.log(msg.type);
-		switch(msg.type)
+		let parseDraw = (msg) =>
 		{
-		case "draw":
-			draw.draw(drawing_board.ctx, msg.from, msg.to, msg.opt[1], msg.opt[0]);
-			break;
-		case "end":
-			draw.drawEnd(drawing_board.ctx, msg.to, msg.opt[1], msg.opt[0]);
-			break;
-		case "erase":
-			draw.erase(drawing_board.ctx, drawing_board.w, drawing_board.h, msg.opt[0]);
-			break;
-		case "fill":
-			draw.fill(drawing_board.ctx, drawing_board.w, drawing_board.h, msg.from[0], msg.from[1], msg.opt[0]);
-			break;
+			switch(msg.subtype)
+			{
+			case "draw":
+				draw.draw(drawing_board.ctx, msg.from, msg.to, msg.opt[1], msg.opt[0]);
+				break;
+			case "end":
+				draw.drawEnd(drawing_board.ctx, msg.to, msg.opt[1], msg.opt[0]);
+				break;
+			case "erase":
+				draw.erase(drawing_board.ctx, drawing_board.w, drawing_board.h, msg.opt[0]);
+				break;
+			case "fill":
+				draw.fill(drawing_board.ctx, drawing_board.w, drawing_board.h, msg.from[0], msg.from[1], msg.opt[0]);
+				break;
+			}
+		}
+
+		if (msg.type == "draw")
+		{
+			parseDraw(msg);
+		}
+		else
+		{
+			msg.forEach(e => parseDraw(e));
 		}
 	});
 }

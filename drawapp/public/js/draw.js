@@ -12,7 +12,7 @@ export function draw (ctx, prev, curr, radius, color)
 	ctx.closePath();
 
 	if (!(typeof(color)=="string"))
-		Connection.send({type:"draw", opt:[color.toHexStr(),radius], from:prev, to:curr});
+		Connection.send({type:"draw", subtype:"draw", opt:[color.toHexStr(),radius], from:prev, to:curr});
 }
 
 export function drawEnd (ctx, curr, radius, color)
@@ -24,7 +24,7 @@ export function drawEnd (ctx, curr, radius, color)
 	ctx.closePath();
 
 	if (!(typeof(color)=="string"))
-		Connection.send({type:"end", opt:[color.toHexStr(),radius], to:curr});
+		Connection.send({type:"draw", subtype:"end", opt:[color.toHexStr(),radius], to:curr});
 }
 
 export function erase(ctx, w, h, color)
@@ -36,7 +36,7 @@ export function erase(ctx, w, h, color)
 	ctx.closePath();
 
 	if (!(typeof(color)=="string"))
-		Connection.send({type:"erase", opt:[color.toHexStr()]});
+		Connection.send({type:"draw", subtype:"erase", opt:[color.toHexStr()]});
 }
 
 export function fill(ctx, w, h, x0, y0, color)
@@ -73,5 +73,5 @@ export function fill(ctx, w, h, x0, y0, color)
 	ctx.putImageData(imgData, 0, 0);
 
 	if (!(typeof(color)=="string"))
-		Connection.send({type:"fill", opt:[color.toHexStr()], from:[x0,y0]});
+		Connection.send({type:"draw", subtype:"fill", opt:[color.toHexStr()], from:[x0,y0]});
 }

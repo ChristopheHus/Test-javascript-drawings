@@ -50,6 +50,8 @@ var server = http.createServer(function(request, response)
 });
 var clients = [];
 
+var messages_logs = [];
+
 
 server.listen(1337, function() { });
 
@@ -65,10 +67,26 @@ wsServer.on('request', function(request)
 
 	connection.on('message', function(message)
 	{
-		console.log("Message", message);
 		if (message.type == "utf8")
 		{
-			clients.forEach(e => {e.send(message.utf8Data);});
+			console.log(message.utf8Data);
+			try
+			{
+				var json = JSON.parse(message.utf8Data);
+				if (json.type == "draw")
+				{
+					messages_logs.push(json);
+					clients.forEach(e => {e.send(message.utf8Data);});
+				}
+				else if (json.type == "init")
+				{
+					connection.send(JSON.stringify(messages_logs));
+				}
+			}
+			catch(e)
+			{
+				console.error(e);
+			}
 		}
 		else
 		{
