@@ -154,7 +154,7 @@ function findxy(res, e)
 window.cursorResize = cursorResize;
 function cursorResize (value)
 {
-	cursor.radius = parseInt(value);
+	cursor.radius = value;
 	cursor.circ_pointer.style.width = cursor.radius;
 	cursor.circ_pointer.style.height = cursor.radius;
 }

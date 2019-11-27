@@ -50,6 +50,7 @@ var server = http.createServer(function(request, response)
 });
 var clients = [];
 
+var next_id = 0;
 var messages_logs = [];
 
 
@@ -63,7 +64,9 @@ wsServer = new WebSocketServer(
 wsServer.on('request', function(request)
 {
 	var connection = request.accept(null, request.origin);
-	clients.push(connection);
+	var name = "player"+next_id++;
+	clients.push({name:name, socket:connection});
+	console.log(connection);
 
 	connection.on('message', function(message)
 	{
@@ -76,11 +79,15 @@ wsServer.on('request', function(request)
 				if (json.type == "draw")
 				{
 					messages_logs.push(json);
-					clients.forEach(e => {e.send(message.utf8Data);});
+					clients.forEach(e => {e.socket.send(message.utf8Data);});
 				}
 				else if (json.type == "init")
 				{
 					connection.send(JSON.stringify(messages_logs));
+				}
+				else if (json.type == "name")
+				{
+					
 				}
 			}
 			catch(e)

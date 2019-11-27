@@ -15,6 +15,7 @@ class ColorWheel
 		this.size_picker = null;
 
 		this.pointer = new Color();
+		this.radius = 20;
 		this.positions = {cx:0, cy:0, valueStart:0, width:0, sizeStart:0};
 	}
 
@@ -51,7 +52,7 @@ class ColorWheel
 		ClickHandler.addField(
 			"size_picker",
 			{x:this.canvas.offsetLeft+this.positions.sizeStart, y:this.canvas.offsetTop, w:this.positions.width, h:this.canvas.height},
-			(s,e) => {window.cursorResize(91-(e.clientY-this.canvas.offsetTop)/this.canvas.height*90);}
+			(s,e) => {this.moveSizePicker(e);}
 		)
 
 		
@@ -63,7 +64,7 @@ class ColorWheel
 		this.value_picker.style.width = (this.positions.width + 6) + "px";
 
 		this.size_picker.style.left = (this.canvas.offsetLeft + this.positions.sizeStart - 4) + "px";
-		this.size_picker.style.top = (this.canvas.offsetTop + this.canvas.height - 4) + "px";
+		this.size_picker.style.top = (this.canvas.offsetTop + this.canvas.height - Math.floor((this.radius-1)/90) - 4) + "px";
 		this.size_picker.style.width = (this.positions.width + 6) + "px";
 
 		this.render();
@@ -94,10 +95,24 @@ class ColorWheel
 		this.value_picker.style.left = (this.canvas.offsetLeft + this.positions.valueStart - 4) + "px";
 		this.value_picker.style.top = (this.canvas.offsetTop + this.pointer.V()*this.canvas.height) - 4 + "px";
 
+		this.size_picker.style.left = (this.canvas.offsetLeft + this.positions.sizeStart - 4) + "px";
+		this.size_picker.style.top = (this.canvas.offsetTop + this.canvas.height - Math.floor((this.radius-1)/90) - 4) + "px";
+
 		ClickHandler.updateArea("color_picker", {x:this.canvas.offsetLeft, y:this.canvas.offsetTop, w:this.canvas.height, h:this.canvas.height});
 		ClickHandler.updateArea("value_picker", {x:this.canvas.offsetLeft+this.positions.valueStart, y:this.canvas.offsetTop, w:this.positions.width, h:this.canvas.height});
 		ClickHandler.updateArea("size_picker", {x:this.canvas.offsetLeft+this.positions.sizeStart, y:this.canvas.offsetTop, w:this.positions.width, h:this.canvas.height});
-	} 
+	}
+
+	moveSizePicker (e)
+	{
+		let y = e.clientY - this.canvas.offsetTop;
+		y = y<0 ? 0 : y;
+		y = y>this.canvas.height ? this.canvas.height : y;
+
+		this.radius = Math.round(91-y/this.canvas.height*90);
+		window.cursorResize(this.radius);
+		this.size_picker.style.top = (this.canvas.offsetTop + y - 4) + "px";
+	}
 
 	moveValuePicker (e)
 	{
