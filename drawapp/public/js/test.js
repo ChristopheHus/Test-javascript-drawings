@@ -74,9 +74,15 @@ export function init()
 		{
 			parseDraw(msg);
 		}
-		else
+		else if (msg.type == "drawhistory")
 		{
-			msg.forEach(e => parseDraw(e));
+			msg.data.forEach(e => parseDraw(e));
+		}
+		else if (msg.type == "message")
+		{
+			var paragraph = document.createElement("li");
+			paragraph.innerHTML = msg.author + " : " + msg.message;
+			document.getElementById("message_history").appendChild(paragraph);
 		}
 	});
 }

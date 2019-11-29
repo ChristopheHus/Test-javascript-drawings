@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var fs = require('fs')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -39,8 +40,21 @@ app.use(function(err, req, res, next)
 module.exports = app;
 
 process.env.port = 5000;
+process.env.port2 = 1337;
 
 
+
+
+
+
+var words = new Promise((resolve, reject) =>
+{
+	fs.readFile('words.txt', (err, data) =>
+	{
+		if (err) reject(err);
+		resolve(data.toString().split("\n"));
+	})
+});
 
 var WebSocketServer = require('websocket').server;
 var http = require('http');
@@ -48,13 +62,21 @@ var http = require('http');
 var server = http.createServer(function(request, response)
 {
 });
+
+const STATES = {
+	START: 0,
+	CHOOSING: 1,
+	DRAWING: 2
+};
+
 var clients = [];
+var idPlayer1 = 0, nextPlayer = 0;
 
 var next_id = 0;
 var messages_logs = [];
 
 
-server.listen(1337, function() { });
+server.listen(process.env.port2, function() { });
 
 wsServer = new WebSocketServer(
 {
@@ -66,29 +88,39 @@ wsServer.on('request', function(request)
 	var connection = request.accept(null, request.origin);
 	var name = "player"+next_id++;
 	clients.push({name:name, socket:connection});
+	const id = clients.find(e => e.socket===connection);
 	console.log(connection);
 
 	connection.on('message', function(message)
 	{
 		if (message.type == "utf8")
 		{
-			console.log(message.utf8Data);
 			try
 			{
 				var json = JSON.parse(message.utf8Data);
-				if (json.type == "draw")
+				switch (json.type)
 				{
+				case "draw":
 					messages_logs.push(json);
-					clients.forEach(e => {e.socket.send(message.utf8Data);});
+					clients.forEach((e,i) => {if(i!==id) e.socket.send(message.utf8Data);});
+					break;
+				case "init":
+					connection.send(JSON.stringify({type:"drawhistory",data:messages_logs}));
+					break;
+				case "name":
+					const old = clients[id];
+					clients[id].name = json.name;
+					clients.forEach(e => {if(i!==id) e.socket.send({type:"nameChange",old:old, new:clients[id].name});});
+					break;
+				case "message":
+					// TODO : test word
+					clients.forEach(e => {if(i!==id) e.socket.send({type:"message",author:clients[id].name,message:json.message});});
+					break;
+				case "choose":
+					// TODO : launch drawing phase
+					break;
 				}
-				else if (json.type == "init")
-				{
-					connection.send(JSON.stringify(messages_logs));
-				}
-				else if (json.type == "name")
-				{
-					
-				}
+				
 			}
 			catch(e)
 			{
@@ -103,6 +135,7 @@ wsServer.on('request', function(request)
 
 	connection.on('close', function(connection)
 	{
+		clients[id] = undefined;
 		console.log("Closing", connection);
 	});
 });

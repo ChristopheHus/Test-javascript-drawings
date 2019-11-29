@@ -76,6 +76,14 @@ body
 	background-color: #aaddbb;
 }
 
+#readystate
+{
+	position: absolute;
+	bottom: 0;
+	background-color: #55aa77;
+	width: 100%;
+}
+
 #messages
 {
 	position: absolute;
@@ -97,4 +105,9 @@ body
 	background-color: #aabbdd;
 	text-align: center;
 	vertical-align: middle;
+}
+
+#message_history
+{
+	list-style-type: none;
 }
